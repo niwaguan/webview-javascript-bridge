@@ -1,7 +1,7 @@
 name: webview_javascript_bridge
 description: A bridge for JavaScript communicate with webview_flutter.
 version: 1.0.2
-homepage:
+homepage: https://github.com/niwaguan/webview-javascript-bridge
 
 environment:
   sdk: ">=2.16.1 <3.0.0"
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  webview_flutter:
+  webview_flutter: ^3.0.4
 
 dev_dependencies:
   flutter_test:
