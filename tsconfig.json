@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "outDir": "dist/",
+    "sourceMap": true,
+    "target": "esnext",
+    "module": "ESNext",
+    "declaration": true,
+    "declarationMap": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "removeComments": true,
+    "pretty": true,
+    "lib": [
+      "esnext", "dom"
+    ],
+  },
+  "include": [
+    "typescript"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/tests/*"
+  ]
+}
