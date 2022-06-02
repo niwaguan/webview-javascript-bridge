@@ -1,6 +1,6 @@
 {
   "name": "webview-javascript-bridge",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A bridge for JavaScript communicate with webview_flutter.",
   "main": "dist/index.js",
   "types": "dist/**/*.d.ts",

@@ -1,6 +1,6 @@
 name: webview_javascript_bridge
 description: A bridge for JavaScript communicate with webview_flutter.
-version: 1.0.1
+version: 1.0.2
 homepage:
 
 environment:
