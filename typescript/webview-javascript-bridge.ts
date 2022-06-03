@@ -162,7 +162,7 @@ export default class WebViewJavaScriptBridge {
       if (typeof func !== 'function') {
         return `no handler for message: ${message.id}`;
       }
-      let ret = func(message.params);
+      const ret = func(message.params);
       return ret ? JSON.stringify(ret) : ret;
     }
   }
