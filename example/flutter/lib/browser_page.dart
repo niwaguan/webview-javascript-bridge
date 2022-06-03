@@ -39,23 +39,44 @@ class _BrowserPageState extends State<BrowserPage>
           ),
         ],
       ),
-      body: WebView(
-        initialUrl: "http://localhost:1077/",
-        // initialUrl: "https://www.baidu.com",
-        javascriptMode: JavascriptMode.unrestricted,
-        javascriptChannels: {
-          channelForBridge,
-        },
-        onWebViewCreated: (controller) {
-          _webviewController.complete(controller);
-          bridge.updateWebViewController(controller);
-        },
-        onWebResourceError: (e) {
-          print(e);
-        },
-        onProgress: (progress) {
-          print('loading ${progress.toString()}');
-        },
+      body: Column(
+        children: [
+          SizedBox(
+            height: 44,
+            child: Wrap(
+              children: [
+                TextButton(
+                  onPressed: () async {
+                    final ret =
+                        await bridge.sendMessage(function: 'jsFunction');
+                    print("got value: $ret");
+                  },
+                  child: const Text('call JavaScript'),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: WebView(
+              initialUrl: "http://localhost:1077/",
+              // initialUrl: "https://www.baidu.com",
+              javascriptMode: JavascriptMode.unrestricted,
+              javascriptChannels: {
+                channelForBridge,
+              },
+              onWebViewCreated: (controller) {
+                _webviewController.complete(controller);
+                bridge.updateWebViewController(controller);
+              },
+              onWebResourceError: (e) {
+                print(e);
+              },
+              onProgress: (progress) {
+                print('loading ${progress.toString()}');
+              },
+            ),
+          )
+        ],
       ),
     );
   }

@@ -63,9 +63,9 @@ function callNativeCrazy() {
 onMounted(() => {
   state.userAgent = navigator.userAgent;
   state.cookie = document.cookie;
-
-  webViewJavaScriptBridge.registerMessageHandler("jsFunc", (params: string) => {
-    return `js response ${params}`;
+  webViewJavaScriptBridge.setLogger(console.log);
+  webViewJavaScriptBridge.registerMessageHandler("jsFunction", () => {
+    return {foo: "bar", zh: "中文贼溜"};
   });
 });
 </script>

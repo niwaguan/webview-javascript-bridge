@@ -1,0 +1,27 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+/pubspec.lock
+**/doc/api/
+.dart_tool/
+.packages
+build/
+node_modules/
+dist/
+example/
+typescript/
+*.json

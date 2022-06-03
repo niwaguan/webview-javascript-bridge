@@ -59,9 +59,9 @@ class WebViewJavaScriptBridge {
     assert(handled == true, 'a message not handled. $bridgeMessage');
   }
 
-  Future<T?> sendMessage<T>({required String function, Object? params}) async {
-    final ret = await _sendMessage(function: function, params: params);
-    return Future.value(ret as T);
+  /// sending a message to JavaScript.
+  Future<String?> sendMessage({required String function, Object? params}) {
+    return _sendMessage(function: function, params: params);
   }
 
   /// 发送消息到Web

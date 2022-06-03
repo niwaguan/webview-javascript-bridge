@@ -9,7 +9,7 @@ type PromiseResolver = <T>(value: T | PromiseLike<T>) => void;
 /// i want to declare type: 
 /// declare type MessageHandler = <ParamsType, ReturnType>(params: ParamsType) => ReturnType;
 /// but i got an error.
-type MessageHandler = (params: any) => any;
+type MessageHandler = (params?: any) => any;
 
 /// logger type
 type Logger = (...args: any) => void;
@@ -106,6 +106,10 @@ export default class WebViewJavaScriptBridge {
     this.encoder = encoder;
   }
 
+  public setLogger(logger: Logger) {
+    this.logger = logger;
+  }
+
   /**
    * log in console
    * @param  {...any} args the log info
@@ -158,7 +162,8 @@ export default class WebViewJavaScriptBridge {
       if (typeof func !== 'function') {
         return `no handler for message: ${message.id}`;
       }
-      return func(message.params);
+      let ret = func(message.params);
+      return ret ? JSON.stringify(ret) : ret;
     }
   }
 }
