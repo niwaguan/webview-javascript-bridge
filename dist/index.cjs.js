@@ -1,3 +1,7 @@
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
 class JSONUriEncoder {
     scheme;
     host;
@@ -164,5 +168,8 @@ class JSONEncoder {
 const webViewJavaScriptBridge = new WebViewJavaScriptBridge();
 window.webViewJavaScriptBridge = webViewJavaScriptBridge;
 
-export { JSONEncoder, JSONUriEncoder, UriEncoder, webViewJavaScriptBridge as default };
-//# sourceMappingURL=index.js.map
+exports.JSONEncoder = JSONEncoder;
+exports.JSONUriEncoder = JSONUriEncoder;
+exports.UriEncoder = UriEncoder;
+exports["default"] = webViewJavaScriptBridge;
+//# sourceMappingURL=index.cjs.js.map

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "types",
+    "outDir": "./",
     "rootDir": ".",
     "sourceMap": true,
     "target": "esnext",
