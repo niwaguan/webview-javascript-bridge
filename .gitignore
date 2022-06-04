@@ -28,5 +28,4 @@
 .packages
 build/
 node_modules
-dist
 example/html/node_modules
