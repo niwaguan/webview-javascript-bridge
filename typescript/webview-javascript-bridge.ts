@@ -24,7 +24,7 @@ export default class WebViewJavaScriptBridge {
     this.callbackId = 1;
     this.callbacks = new Map();
     this.handlers = new Map();
-    this.encoder = new JSONUriEncoder('cs2go', 'c.cs2go.com');
+    this.encoder = new JSONUriEncoder();
   }
 
   /**

@@ -4,7 +4,7 @@ import EncoderArgs from './encoder-args';
 export default class JSONUriEncoder implements Encoder {
   private scheme: string;
   private host: string;
-  constructor(scheme: string, host: string) {
+  constructor(scheme = "webviewjsbridge", host = "stormyang.cn") {
     this.scheme = scheme;
     this.host = host;
   }
