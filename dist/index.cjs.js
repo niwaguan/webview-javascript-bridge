@@ -5,7 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 class JSONUriEncoder {
     scheme;
     host;
-    constructor(scheme, host) {
+    constructor(scheme = "webviewjsbridge", host = "stormyang.cn") {
         this.scheme = scheme;
         this.host = host;
     }
@@ -30,7 +30,7 @@ class WebViewJavaScriptBridge {
         this.callbackId = 1;
         this.callbacks = new Map();
         this.handlers = new Map();
-        this.encoder = new JSONUriEncoder('cs2go', 'c.cs2go.com');
+        this.encoder = new JSONUriEncoder();
     }
     sendMessage(message) {
         return new Promise((resolve, reject) => {
