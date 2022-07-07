@@ -3,8 +3,6 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 class JSONUriEncoder {
-    scheme;
-    host;
     constructor(scheme = "webviewjsbridge", host = "stormyang.cn") {
         this.scheme = scheme;
         this.host = host;
@@ -21,11 +19,6 @@ class JSONUriEncoder {
 }
 
 class WebViewJavaScriptBridge {
-    callbackId;
-    callbacks;
-    handlers;
-    encoder;
-    logger;
     constructor() {
         this.callbackId = 1;
         this.callbacks = new Map();
@@ -94,7 +87,8 @@ class WebViewJavaScriptBridge {
         this.logger = logger;
     }
     _log(...args) {
-        this.logger?.call(this.logger, ...args);
+        var _a;
+        (_a = this.logger) === null || _a === void 0 ? void 0 : _a.call(this.logger, ...args);
     }
     _pushCallback(cb) {
         const id = this.callbackId++;
@@ -131,7 +125,6 @@ class WebViewJavaScriptBridge {
 }
 
 class UriEncoder {
-    scheme;
     constructor(scheme = 'webviewjsbridge') {
         this.scheme = scheme;
     }
