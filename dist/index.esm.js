@@ -110,17 +110,13 @@ class WebViewJavaScriptBridge {
             if (typeof func !== 'function') {
                 return `no handler for message: ${message.id}`;
             }
-            const ret = func(message.params);
-            let result = ret;
-            if (ret === undefined || ret === null) {
-                result = '';
+            let ret = func(message.params);
+            if (typeof ret === 'object' && ret !== null) {
+                ret = JSON.stringify(ret);
             }
-            else if (typeof ret === 'object') {
-                result = JSON.stringify(ret);
-            }
-            return result;
+            return ret;
         }
-        throw 'message must have a id or callbackId.';
+        throw Error('message must have a id or callbackId.');
     }
 }
 

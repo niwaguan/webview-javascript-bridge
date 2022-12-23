@@ -164,6 +164,6 @@ export default class WebViewJavaScriptBridge {
       }
       return ret;
     }
-    throw 'message must have a id or callbackId.';
+    throw Error('message must have a id or callbackId.');
   }
 }
