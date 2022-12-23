@@ -6,7 +6,7 @@ import WebViewMessage from './interface/webview-message';
 type PromiseResolver = <T>(value: T | PromiseLike<T>) => void;
 
 /// TODO: typing MessageHandler
-/// i want to declare type: 
+/// i want to declare type:
 /// declare type MessageHandler = <ParamsType, ReturnType>(params: ParamsType) => ReturnType;
 /// but i got an error.
 type MessageHandler = (params?: any) => any;
@@ -31,7 +31,7 @@ export default class WebViewJavaScriptBridge {
    * sending message to webview.
    * @returns webview's response
    */
-   public sendMessage<Response>(message: JavaScriptMessage) {
+  public sendMessage<Response>(message: JavaScriptMessage) {
     return new Promise<Response>((resolve, reject) => {
       if (!message.action || message.action.length <= 0) {
         reject('action is invalid');
@@ -42,18 +42,11 @@ export default class WebViewJavaScriptBridge {
       if (channelImp === null || channelImp === undefined) {
         reject(`
         channel named "${channel}" not found in flutter. please add channel:
-        WebView(
-          url: ...,
+        late final _webviewController = WebViewController()
           ...
-          javascriptChannels: {
-            JavascriptChannel(
-              name: "${channel}",
-              onMessageReceived: (message) {
-                (instance of WebViewFlutterJavaScriptBridge).parseJavascriptMessage(message);
-              },
-            ),
-          },
-        )
+          ..addJavaScriptChannel(webviewJavaScriptBridgeChannel,
+              onMessageReceived: _bridge.receiveMessage)
+          ...
         `);
         return;
       }
@@ -80,7 +73,7 @@ export default class WebViewJavaScriptBridge {
    * @param {string} id the function's id
    * @param {MessageHandler} handler the function's implements
    */
-   public registerMessageHandler(id: string, handler: MessageHandler) {
+  public registerMessageHandler(id: string, handler: MessageHandler) {
     if (id === null || id === undefined) {
       return;
     }
@@ -94,7 +87,7 @@ export default class WebViewJavaScriptBridge {
    * unregister a function.
    * @param {string} id the function's id
    */
-   public unregisterMessageHandler(id: string) {
+  public unregisterMessageHandler(id: string) {
     this.handlers.delete(id);
   }
 
@@ -123,7 +116,7 @@ export default class WebViewJavaScriptBridge {
    * 记录一个函数并返回其对应的记录id
    * @param {PromiseResolver} cb 需要记录的函数
    */
-   private _pushCallback(cb: PromiseResolver) {
+  private _pushCallback(cb: PromiseResolver) {
     const id = this.callbackId++;
     const key = `cb_${id}`;
     this.callbacks.set(key, cb);
@@ -134,7 +127,7 @@ export default class WebViewJavaScriptBridge {
    * 删除id对应的函数
    * @param {string} id 函数的id
    */
-   private _popCallback(id: string) {
+  private _popCallback(id: string) {
     if (this.callbacks.has(id)) {
       const cb = this.callbacks.get(id);
       this.callbacks.delete(id);
@@ -146,24 +139,31 @@ export default class WebViewJavaScriptBridge {
    * 接收来自webview的消息
    * @param {string} message Object格式的消息.如{func: xxx, params: {a: 1, b: 2}}
    */
-   private _receiveMessage(message: WebViewMessage) {
+  private _receiveMessage(message: WebViewMessage) {
     this._log(`receive message, id: ${message.id}, callbackId: ${message.callbackId}, params:`, message.params);
     if (message.callbackId) {
+      this._log('this message is a callback');
       const cb = this._popCallback(message.callbackId);
       if (cb) {
         cb(message.params);
+        return true;
       }
-      return;
+      return false;
     }
     const key = message.id;
     if (key) {
+      this._log('this message is a calling to javascript');
       /// 查找处理器并调用
       const func = this.handlers.get(key);
       if (typeof func !== 'function') {
         return `no handler for message: ${message.id}`;
       }
-      const ret = func(message.params);
-      return ret ? JSON.stringify(ret) : ret;
+      let ret = func(message.params);
+      if (typeof ret === 'object' && ret !== null) {
+        ret = JSON.stringify(ret);
+      }
+      return ret;
     }
+    throw 'message must have a id or callbackId.';
   }
 }

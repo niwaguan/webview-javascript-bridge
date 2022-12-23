@@ -1,4 +1,3 @@
-
 A bridge for JavaScript communicate with [webview_flutter](https://pub.dev/packages/webview_flutter).
 
 |             | Android        | iOS  |
@@ -7,8 +6,8 @@ A bridge for JavaScript communicate with [webview_flutter](https://pub.dev/packa
 
 ## Features
 
-* handle message from JavaScript structured.
-* send message to JavaScript easier.
+- handle message from JavaScript structured.
+- send message to JavaScript easier.
 
 ## Usage
 
@@ -22,43 +21,36 @@ First of all, add `webview_javascript_bridge` as a dependency in your pubspec.ya
 flutter pub add webview_javascript_bridge
 ```
 
-And then use the `WebViewJavaScriptBridgeMixin`:
+And then create the bridge instance and init:
 
 ```dart
-class _SomeState extends State<SomePage> with WebViewJavaScriptBridgeMixin {
-    /// your code
+late final _bridge = WebViewJavaScriptBridge();
+late WebViewController _webviewController = WebViewController()
+  // your code
+  ..addJavaScriptChannel(
+    webviewJavaScriptBridgeChannel,
+    onMessageReceived: _bridge.receiveMessage,
+  )
+  // your code
+
+
+@override
+void initState() {
+  super.initState();
+  // your code
+  _bridge.updateWebViewController(_webviewController);
+  // your code
 }
 ```
 
-Next, add `channelForBridge` to your `WebView's javascriptChannels`:
-
-```dart
-WebView(
-    javascriptChannels: {
-        channelForBridge,
-        /// your other channels
-    },
-)
-```
-
-Finally, update `WebViewController` when `WebView` created:
-
-```dart
-WebView(
-    onWebViewCreated: (controller) {
-        bridge.updateWebViewController(controller);
-    },
-)
-```
-
-Oh, don't forget add your message handler for JavaScript, such as Toaster:
+Finally, don't forget add your message handler for JavaScript, such as Toaster:
 
 ```dart
 @override
 void initState() {
     super.initState();
     /// add handler
-    bridge.addMessageHandler(ClosureMessageHandler(
+    _bridge.addMessageHandler(ClosureMessageHandler(
       resolver: (message, controller) => message.action == "toaster",
       handler: (message, controller) {
         // TODO: show the toaster
@@ -86,20 +78,43 @@ npm install webview-javascript-bridge
 Next, import `webViewJavaScriptBridge` as your need:
 
 ```javascript
-import webViewJavaScriptBridge from "webview-javascript-bridge";
+import webViewJavaScriptBridge from 'webview-javascript-bridge';
 ```
 
 Finally, sending a message!
 
 ```javascript
 async function sendingMessage() {
-  let response = await webViewJavaScriptBridge
-    .sendMessage({
-      action: "tester",
-      params: 123456,
-    })
-  console.log("tester's response", response)
+  let response = await webViewJavaScriptBridge.sendMessage({
+    action: 'tester',
+    params: 123456,
+  });
+  console.log("tester's response", response);
 }
 ```
 
 If your use TypeScript, go to example for more details.
+
+## ❗️Tips
+
+### 1. The imp of BridgeJavascriptMessageHandler in Flutter `must` return a `jsonable` type
+
+```dart
+_bridge.addMessageHandler(
+  ClosureMessageHandler(
+    resolver: (m, c) => m.action == "toaster",
+    handler: (m, c) {
+      // ❗️❗️❗️❗️
+      return "this value will response to JavaScript, and it must be jsonable";
+    },
+  ),
+);
+```
+
+### 2. You will get a exception, if a JavaScript function return `null` or `undefined`
+
+```javascript
+final ret = await _bridge.sendMessage(function:"aJavaScriptFunctionReturningNullOrUndefined");
+////// ⬆️ will be empty string.
+
+```

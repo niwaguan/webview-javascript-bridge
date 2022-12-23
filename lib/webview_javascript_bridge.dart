@@ -3,7 +3,6 @@ library webview_javascript_bridge;
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 part './bridge_message.dart';
@@ -13,7 +12,8 @@ part './decoder/json_decoder.dart';
 part './decoder/json_uri_decoder.dart';
 part './decoder/uri_decoder.dart';
 part './message_handler.dart';
-part './webview_javascript_bridge_mixin.dart';
+
+const webviewJavaScriptBridgeChannel = "default";
 
 /// An bridge for sending messages between WebView and JavaScript in flutter_webview.
 class WebViewJavaScriptBridge {
@@ -35,7 +35,7 @@ class WebViewJavaScriptBridge {
   }
 
   /// receive a message from JavaScript
-  receiveMessage(JavascriptMessage message) async {
+  receiveMessage(JavaScriptMessage message) async {
     assert(_webViewController != null,
         "message can not be handled without a WebViewController");
     bool handled = false;
@@ -60,14 +60,14 @@ class WebViewJavaScriptBridge {
   }
 
   /// sending a message to JavaScript.
-  Future<String?> sendMessage({required String function, Object? params}) {
-    return _sendMessage(function: function, params: params);
+  Future<T?> sendMessage<T>({required String function, Object? params}) {
+    return _sendMessage<T>(function: function, params: params);
   }
 
   /// 发送消息到Web
   /// [function] 方法标识。
   /// [params] 传递的参数
-  Future<String?> _sendMessage(
+  Future<T?> _sendMessage<T>(
       {String? function, Object? params, String? callbackId}) async {
     assert(_webViewController != null,
         "message can not send without a WebViewController");
@@ -85,10 +85,17 @@ class WebViewJavaScriptBridge {
         message.keys.isNotEmpty, "a message must have callbackId or function");
     final jsonMessage = json.encode(message);
 
-    /// json string
-    final ret = await _webViewController?.runJavascriptReturningResult("""
+    var ret = await _webViewController?.runJavaScriptReturningResult("""
         window.webViewJavaScriptBridge._receiveMessage($jsonMessage);
         """);
-    return ret;
+
+    /// try decode json string
+    if (ret != null && ret.runtimeType == String) {
+      try {
+        ret = json.decode(ret as String);
+      } catch (_) {}
+    }
+
+    return ret as T;
   }
 }

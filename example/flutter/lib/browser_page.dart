@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_javascript_bridge/webview_javascript_bridge.dart';
@@ -11,14 +9,39 @@ class BrowserPage extends StatefulWidget {
   State<BrowserPage> createState() => _BrowserPageState();
 }
 
-class _BrowserPageState extends State<BrowserPage>
-    with WebViewJavaScriptBridgeMixin {
-  final _webviewController = Completer<WebViewController>();
+class _BrowserPageState extends State<BrowserPage> {
+  /// the bridge for webview and javascript
+  late final WebViewJavaScriptBridge _bridge = WebViewJavaScriptBridge();
+
+  /// the WebViewController
+  late final _webviewController = WebViewController()
+    ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    ..setBackgroundColor(const Color(0x00000000))
+    ..setNavigationDelegate(
+      NavigationDelegate(
+        onProgress: (int progress) {
+          // Update loading bar.
+        },
+        onPageStarted: (String url) {},
+        onPageFinished: (String url) {},
+        onWebResourceError: (WebResourceError error) {},
+        onNavigationRequest: (NavigationRequest request) {
+          if (request.url.startsWith('https://www.youtube.com/')) {
+            return NavigationDecision.prevent;
+          }
+          return NavigationDecision.navigate;
+        },
+      ),
+    )
+    ..addJavaScriptChannel(webviewJavaScriptBridgeChannel,
+        onMessageReceived: _bridge.receiveMessage)
+    ..loadRequest(Uri.parse('http://localhost:1077/'));
 
   @override
   void initState() {
     super.initState();
-    bridge.addMessageHandler(ClosureMessageHandler(
+    _bridge.updateWebViewController(_webviewController);
+    _bridge.addMessageHandler(ClosureMessageHandler(
       resolver: (message, controller) => message.action == "tester",
       handler: (message, controller) {
         print(message);
@@ -47,8 +70,8 @@ class _BrowserPageState extends State<BrowserPage>
               children: [
                 TextButton(
                   onPressed: () async {
-                    final ret =
-                        await bridge.sendMessage(function: 'jsFunction');
+                    final ret = await _bridge.sendMessage<Map<String, dynamic>>(
+                        function: 'jsFunction');
                     print("got value: $ret");
                   },
                   child: const Text('call JavaScript'),
@@ -57,23 +80,8 @@ class _BrowserPageState extends State<BrowserPage>
             ),
           ),
           Expanded(
-            child: WebView(
-              initialUrl: "http://localhost:1077/",
-              // initialUrl: "https://www.baidu.com",
-              javascriptMode: JavascriptMode.unrestricted,
-              javascriptChannels: {
-                channelForBridge,
-              },
-              onWebViewCreated: (controller) {
-                _webviewController.complete(controller);
-                bridge.updateWebViewController(controller);
-              },
-              onWebResourceError: (e) {
-                print(e);
-              },
-              onProgress: (progress) {
-                print('loading ${progress.toString()}');
-              },
+            child: WebViewWidget(
+              controller: _webviewController,
             ),
           )
         ],
@@ -83,10 +91,11 @@ class _BrowserPageState extends State<BrowserPage>
 
   @override
   void reassemble() {
+    super.reassemble();
     _reload();
   }
 
   _reload() {
-    _webviewController.future.then((value) => value.reload());
+    _webviewController.reload();
   }
 }

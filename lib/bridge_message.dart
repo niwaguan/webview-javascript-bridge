@@ -3,7 +3,7 @@ part of webview_javascript_bridge;
 /// the message parsed from JavascriptMessage
 class BridgeMessage {
   /// origin message
-  final JavascriptMessage originMessage;
+  final JavaScriptMessage originMessage;
 
   /// channel name of JavascriptChannel
   final String channel;

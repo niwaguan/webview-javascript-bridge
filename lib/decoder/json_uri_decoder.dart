@@ -5,7 +5,7 @@ class JSONUriDecoder implements Decoder {
   const JSONUriDecoder();
 
   @override
-  BridgeMessage decode(JavascriptMessage message) {
+  BridgeMessage decode(JavaScriptMessage message) {
     final url = Uri.parse(message.message);
     if (url.hasQuery) {
       final argsJSON = url.queryParameters["args"];

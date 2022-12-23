@@ -5,7 +5,7 @@ class UriDecoder implements Decoder {
   const UriDecoder();
 
   @override
-  BridgeMessage decode(JavascriptMessage message) {
+  BridgeMessage decode(JavaScriptMessage message) {
     final url = Uri.parse(message.message);
     final channel = url.host;
     final target = url.path;

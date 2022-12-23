@@ -5,7 +5,7 @@ class JSONDecoder implements Decoder {
   const JSONDecoder();
 
   @override
-  BridgeMessage decode(JavascriptMessage message) {
+  BridgeMessage decode(JavaScriptMessage message) {
     final decoded = json.decode(message.message) as Map<String, dynamic>;
     return BridgeMessage(
       originMessage: message,

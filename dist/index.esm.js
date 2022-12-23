@@ -32,18 +32,11 @@ class WebViewJavaScriptBridge {
             if (channelImp === null || channelImp === undefined) {
                 reject(`
         channel named "${channel}" not found in flutter. please add channel:
-        WebView(
-          url: ...,
+        late final _webviewController = WebViewController()
           ...
-          javascriptChannels: {
-            JavascriptChannel(
-              name: "${channel}",
-              onMessageReceived: (message) {
-                (instance of WebViewFlutterJavaScriptBridge).parseJavascriptMessage(message);
-              },
-            ),
-          },
-        )
+          ..addJavaScriptChannel(webviewJavaScriptBridgeChannel,
+              onMessageReceived: _bridge.receiveMessage)
+          ...
         `);
                 return;
             }
@@ -102,21 +95,32 @@ class WebViewJavaScriptBridge {
     _receiveMessage(message) {
         this._log(`receive message, id: ${message.id}, callbackId: ${message.callbackId}, params:`, message.params);
         if (message.callbackId) {
+            this._log('this message is a callback');
             const cb = this._popCallback(message.callbackId);
             if (cb) {
                 cb(message.params);
+                return true;
             }
-            return;
+            return false;
         }
         const key = message.id;
         if (key) {
+            this._log('this message is a calling to javascript');
             const func = this.handlers.get(key);
             if (typeof func !== 'function') {
                 return `no handler for message: ${message.id}`;
             }
             const ret = func(message.params);
-            return ret ? JSON.stringify(ret) : ret;
+            let result = ret;
+            if (ret === undefined || ret === null) {
+                result = '';
+            }
+            else if (typeof ret === 'object') {
+                result = JSON.stringify(ret);
+            }
+            return result;
         }
+        throw 'message must have a id or callbackId.';
     }
 }
 
